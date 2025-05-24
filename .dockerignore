@@ -1,0 +1,32 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+
+# IDE
+.vscode/
+.idea/
+
+# Venv
+venv/
+.venv/
+
+# Git
+.git/
+.gitignore
+
+# OS
+.DS_Store
+
+# Bytecode
+__pycache__/
+
+# Local env files
+.env
+.envrc
+
+# Alembic cache
+alembic/versions/*.pyc
+alembic/versions/__pycache__/
