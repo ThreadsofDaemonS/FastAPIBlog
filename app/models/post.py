@@ -13,3 +13,4 @@ class Post(Base):
     reply_delay_sec = Column(Integer, default=0)
 
     user = relationship("User", back_populates="posts")
+    comments = relationship("Comment", back_populates="post", cascade="all, delete")

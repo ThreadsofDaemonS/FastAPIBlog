@@ -8,6 +8,7 @@ import os
 # Add app/ to import path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
+from app.models.comment import Comment
 from app.models.post import Post
 from app.models.user import User
 from app.core.db import Base  # ← это важно
