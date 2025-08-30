@@ -1,3 +1,5 @@
+# main.py
+
 from fastapi import FastAPI
 from app.routers import auth, post, comment
 

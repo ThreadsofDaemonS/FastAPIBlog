@@ -1,11 +1,12 @@
+# routers\comment.py
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.db import get_db
 from app.schemas.comment import CommentCreate, CommentRead
 from app.services.comment import create_comment, get_comments_by_post
-
-def get_current_user_id():
-    return 1
+from app.core.security import get_current_user
+from app.models.user import User
 
 router = APIRouter()
 
@@ -13,9 +14,9 @@ router = APIRouter()
 async def create_comment_view(
     comment_in: CommentCreate,
     db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_current_user_id),
+    user: User = Depends(get_current_user),
 ):
-    return await create_comment(user_id, comment_in, db)
+    return await create_comment(user.id, comment_in, db)
 
 @router.get("/post/{post_id}", response_model=list[CommentRead])
 async def get_post_comments(
@@ -24,3 +25,4 @@ async def get_post_comments(
 ):
     records = await get_comments_by_post(post_id, db)
     return [CommentRead.model_validate(row) for row in records]
+

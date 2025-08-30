@@ -10,6 +10,9 @@ async def schedule_auto_reply(comment: Comment, db: AsyncSession):
     if not post or not post.auto_reply_enabled:
         return
 
+    if comment.user_id == post.user_id:     ### НЕ ЗАБУДЬ ПРО ОСЬ ЦЕ
+        return
+
     await asyncio.sleep(post.reply_delay_sec or 1)
 
     reply_text = generate_reply(post.content, comment.content)
