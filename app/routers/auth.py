@@ -1,4 +1,4 @@
-# routers\auth.py
+# routers/auth.py
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
@@ -38,7 +38,4 @@ async def all_users(db: AsyncSession = Depends(get_db)):
 
 @router.get("/me")
 async def get_me(current_user: User = Depends(get_current_user)):
-    return {
-        "id": current_user.id,
-        "email": current_user.email
-    }
+    return current_user

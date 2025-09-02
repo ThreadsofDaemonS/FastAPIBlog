@@ -21,11 +21,11 @@ async def create_post(user_id: int, data: PostCreate, db: AsyncSession):
     await db.refresh(post)
     return post
 
-async def get_posts_by_user(user_id: int, db: AsyncSession):
+async def get_posts_by_user(user_id: int, db: AsyncSession) -> list[Post]:
     result = await db.execute(Post.__table__.select().where(Post.user_id == user_id))
     return result.fetchall()
 
-async def get_post(post_id: int, user_id: int, db: AsyncSession):
+async def get_post(post_id: int, user_id: int, db: AsyncSession) -> Post:
     result = await db.execute(select(Post).where(Post.id == post_id, Post.user_id == user_id))
     post = result.scalar_one_or_none()
     if not post:

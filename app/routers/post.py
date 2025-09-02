@@ -1,4 +1,4 @@
-# routers\post.py
+# routers/post.py
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -39,21 +39,3 @@ async def get_post_by_id(
     user: User = Depends(get_current_user),
 ):
     return await get_post(post_id, user.id, db)
-
-@router.put("/{post_id}", response_model=PostRead)
-async def update_post_view(
-    post_id: int,
-    data: PostCreate,
-    db: AsyncSession = Depends(get_db),
-    user: User = Depends(get_current_user),
-):
-    return await update_post(post_id, user.id, data, db)
-
-@router.delete("/{post_id}")
-async def delete_post_view(
-    post_id: int,
-    db: AsyncSession = Depends(get_db),
-    user: User = Depends(get_current_user),
-):
-    await delete_post(post_id, user.id, db)
-    return {"ok": True}

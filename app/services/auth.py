@@ -1,4 +1,4 @@
-# services\auth.py
+# services/auth.py
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.schemas.user import UserCreate
@@ -12,8 +12,7 @@ async def create_user(user_in: UserCreate, db: AsyncSession):
     await db.refresh(user)
     return user
 
-async def get_all_users(db: AsyncSession):
+async def get_all_users(db: AsyncSession) -> list[User]:
     from sqlalchemy.future import select
     result = await db.execute(select(User))
     return result.scalars().all()
-

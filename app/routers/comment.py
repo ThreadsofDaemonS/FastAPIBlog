@@ -1,4 +1,4 @@
-# routers\comment.py
+# routers/comment.py
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -25,4 +25,3 @@ async def get_post_comments(
 ):
     records = await get_comments_by_post(post_id, db)
     return [CommentRead.model_validate(row) for row in records]
-

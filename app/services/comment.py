@@ -22,6 +22,6 @@ async def create_comment(user_id: int, data: CommentCreate, db: AsyncSession):
 
     return comment
 
-async def get_comments_by_post(post_id: int, db: AsyncSession):
+async def get_comments_by_post(post_id: int, db: AsyncSession) -> list[Comment]:
     result = await db.execute(Comment.__table__.select().where(Comment.post_id == post_id))
     return result.fetchall()

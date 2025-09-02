@@ -8,6 +8,15 @@ GOOGLE_API_KEY = config("GOOGLE_API_KEY")
 client = genai.Client(api_key=GOOGLE_API_KEY)
 
 def is_text_toxic(text: str) -> bool:
+    # Список заборонених слів для ручної перевірки
+    blacklist = ["хуйня", "пизда", "єбать", "хуй", "блядь", "сука"]
+
+    # Перевірка наявності слова зі списку
+    if any(bad_word in text.lower() for bad_word in blacklist):
+        print("[MANUAL TOXICITY DETECTED] YES")
+        return True
+
+    # Якщо немає збігу, використовуємо AI для перевірки
     prompt = (
         "Визнач, чи є наступний текст образливим, токсичним або неприйнятним. "
         "Відповідай тільки 'YES' або 'NO'.\n\n"
@@ -29,7 +38,6 @@ def is_text_toxic(text: str) -> bool:
     except Exception as e:
         print("[AI MODERATION ERROR]", e)
         return False
-
 
 def generate_reply(post_text: str, comment_text: str) -> str:
     prompt = (
