@@ -9,16 +9,15 @@ class TestAuth:
         """Test successful user registration."""
         user_data = {
             "email": "newuser@example.com",
-            "password": "password123",
-            "full_name": "New User"
+            "password": "password123"
         }
         response = await client.post("/auth/register", json=user_data)
 
         assert response.status_code == 200
         data = response.json()
         assert data["email"] == user_data["email"]
-        assert data["full_name"] == user_data["full_name"]
         assert "id" in data
+        assert "password" not in data
         assert "hashed_password" not in data
 
     async def test_register_duplicate_email(self, client: AsyncClient, test_user_data):
