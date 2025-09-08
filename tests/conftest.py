@@ -1,6 +1,7 @@
 import pytest
+import pytest_asyncio
 import asyncio
-from httpx import AsyncClient
+from httpx import AsyncClient, ASGITransport
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import NullPool
@@ -9,6 +10,7 @@ from app.core.db import get_db, Base
 from app.models.user import User  # Приклад для створення тестового користувача
 from decouple import Config, RepositoryEnv
 from unittest.mock import patch
+from app.core.security import hash_password, create_access_token
 
 # Завантаження змінних середовища з .env.test
 env_config = Config(RepositoryEnv(".env.test"))
@@ -40,16 +42,7 @@ TestingSessionLocal = sessionmaker(
 )
 
 
-@pytest.fixture(scope="session")
-def event_loop():
-    """Створити подієвий цикл для тестової сесії."""
-    policy = asyncio.get_event_loop_policy()
-    loop = policy.new_event_loop()
-    yield loop
-    loop.close()
-
-
-@pytest.fixture(scope="session")
+@pytest_asyncio.fixture(scope="session")
 async def setup_test_db():
     """Підготовка бази даних для тестування (один раз за сесію)."""
     async with test_engine.begin() as conn:
@@ -61,18 +54,21 @@ async def setup_test_db():
     await test_engine.dispose()
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def db_session(setup_test_db):
     """Чиста сесія бази даних для кожного тесту."""
+    # Create a fresh session for each test
     async with TestingSessionLocal() as session:
-        # Почати транзакцію
-        transaction = await session.begin()
         yield session
-        # Відкотити транзакцію для очищення
-        await transaction.rollback()
+        # After test - manually clean up all tables
+        await session.rollback()
+        # Delete all data from tables
+        for table in reversed(Base.metadata.sorted_tables):
+            await session.execute(table.delete())
+        await session.commit()
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def client(db_session):
     """Тестовий клієнт із перевизначеною залежністю бази даних."""
 
@@ -81,33 +77,51 @@ async def client(db_session):
 
     app.dependency_overrides[get_db] = override_get_db
 
-    async with AsyncClient(app=app, base_url="http://test") as ac:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
         yield ac
 
     app.dependency_overrides.clear()
 
 
 @pytest.fixture
-async def test_user(db_session):
+def test_user_data():
+    """Фікстура з даними тестового користувача."""
+    return {
+        "email": "test@example.com",
+        "password": "password123"
+    }
+
+
+@pytest_asyncio.fixture
+async def test_user(db_session, test_user_data):
     """Фікстура для створення тестового користувача."""
-    user = User(email="test@example.com", hashed_password="hashed_password")
+    user = User(
+        email=test_user_data["email"], 
+        hashed_password=hash_password(test_user_data["password"])
+    )
     db_session.add(user)
     await db_session.commit()
     await db_session.refresh(user)
     return user
 
 
-@pytest.fixture
-async def authenticated_client(client, test_user):
-    """Фікстура для аутентифікованого клієнта."""
-    # Симуляція авторизації
-    token = "mocked_jwt_token"
-    client.headers.update({"Authorization": f"Bearer {token}"})
-    return client
+@pytest_asyncio.fixture
+async def authenticated_user(client, test_user, test_user_data):
+    """Фікстура для аутентифікованого користувача."""
+    # Створити JWT токен для тестового користувача
+    access_token = create_access_token(data={"sub": test_user.email})
+    headers = {"Authorization": f"Bearer {access_token}"}
+    
+    return {
+        "user": test_user,
+        "user_data": test_user_data,
+        "headers": headers,
+        "token": access_token
+    }
 
 
 @pytest.fixture
 def mock_google_ai():
     """Фікстура для мокування Google AI API."""
-    with patch("services.ai_moderation.client.models.generate_content") as mock:
+    with patch("app.services.ai_moderation.client.models.generate_content") as mock:
         yield mock

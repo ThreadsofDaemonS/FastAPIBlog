@@ -39,3 +39,21 @@ async def get_post_by_id(
     user: User = Depends(get_current_user),
 ):
     return await get_post(post_id, user.id, db)
+
+@router.put("/{post_id}", response_model=PostRead)
+async def update_post_by_id(
+    post_id: int,
+    post_in: PostCreate,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    return await update_post(post_id, user.id, post_in, db)
+
+@router.delete("/{post_id}")
+async def delete_post_by_id(
+    post_id: int,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    await delete_post(post_id, user.id, db)
+    return {"message": "Post deleted successfully"}
