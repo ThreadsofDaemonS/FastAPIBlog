@@ -4,23 +4,23 @@ from google.genai.types import GenerateContentConfig
 
 GOOGLE_API_KEY = config("GOOGLE_API_KEY")
 
-# Ініціалізація клієнта
+# Initialize the client
 client = genai.Client(api_key=GOOGLE_API_KEY)
 
 def is_text_toxic(text: str) -> bool:
-    # Список заборонених слів для ручної перевірки
+    # List of banned words for manual checking
     blacklist = ["хуйня", "пизда", "єбать", "хуй", "блядь", "сука"]
 
-    # Перевірка наявності слова зі списку
+    # Check for presence of words from the list
     if any(bad_word in text.lower() for bad_word in blacklist):
         print("[MANUAL TOXICITY DETECTED] YES")
         return True
 
-    # Якщо немає збігу, використовуємо AI для перевірки
+    # If no match, use AI for checking
     prompt = (
-        "Визнач, чи є наступний текст образливим, токсичним або неприйнятним. "
-        "Відповідай тільки 'YES' або 'NO'.\n\n"
-        f"Текст: {text}"
+        "Determine if the following text is offensive, toxic, or inappropriate. "
+        "Answer only 'YES' or 'NO'.\n\n"
+        f"Text: {text}"
     )
 
     try:
@@ -41,12 +41,12 @@ def is_text_toxic(text: str) -> bool:
 
 def generate_reply(post_text: str, comment_text: str) -> str:
     prompt = (
-        "Сформуй коротку, релевантну відповідь українською мовою на цей коментар, враховуючи зміст поста. "
-        "Відповідь має бути простою, щирою, неформальною. "
-        "Без зайвих пояснень, без вступів, без лапок, без форматування. "
-        "Пиши лише відповідь — одне-два речення максимум.\n\n"
-        f"Пост: {post_text}\n"
-        f"Коментар: {comment_text}"
+        "Generate a short, relevant reply in English to this comment, considering the post content. "
+        "The reply should be simple, sincere, and informal. "
+        "No unnecessary explanations, no introductions, no quotes, no formatting. "
+        "Write only the reply — one to two sentences maximum.\n\n"
+        f"Post: {post_text}\n"
+        f"Comment: {comment_text}"
     )
 
     try:
@@ -63,4 +63,4 @@ def generate_reply(post_text: str, comment_text: str) -> str:
         return reply
     except Exception as e:
         print("[AI REPLY ERROR]", e)
-        return "Дякую за ваш коментар!"
+        return "Thank you for your comment!"
