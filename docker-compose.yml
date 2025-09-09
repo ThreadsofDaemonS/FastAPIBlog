@@ -1,29 +1,47 @@
 services:
   db:
-    image: postgres:15
+    image: postgres:15-alpine
     environment:
-      POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB} -h 127.0.0.1"]
+      interval: 1s
+      timeout: 5s
+      retries: 30
+    networks:
+      - fastapi_blog_network
 
   web:
-    build: .
+    build:
+      context: .
     command: >
-      bash -c "python wait_for_db.py &&
-               alembic upgrade head &&
-               uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+      bash -c "
+      alembic upgrade head &&
+      exec uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
     volumes:
       - .:/app
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - SECRET_KEY=${SECRET_KEY}
+      - ALGORITHM=${ALGORITHM}
+      - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES}
     ports:
       - "8000:8000"
     depends_on:
-      - db
-    env_file:
-      - .env
+      db:
+        condition: service_healthy
+    networks:
+      - fastapi_blog_network
+
+networks:
+  fastapi_blog_network:
+    driver: bridge
 
 volumes:
   postgres_data:
