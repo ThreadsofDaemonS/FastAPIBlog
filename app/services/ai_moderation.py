@@ -4,19 +4,20 @@ from google.genai.types import GenerateContentConfig
 
 GOOGLE_API_KEY = config("GOOGLE_API_KEY")
 
-# Ініціалізація клієнта
+# Initialize client
 client = genai.Client(api_key=GOOGLE_API_KEY)
 
 def is_text_toxic(text: str) -> bool:
-    # Список заборонених слів для ручної перевірки
+    # List of banned words for manual checking
     blacklist = ["хуйня", "пизда", "єбать", "хуй", "блядь", "сука"]
 
-    # Перевірка наявності слова зі списку
+    # Check for presence of words from the list
     if any(bad_word in text.lower() for bad_word in blacklist):
         print("[MANUAL TOXICITY DETECTED] YES")
         return True
 
-    # Якщо немає збігу, використовуємо AI для перевірки
+    # If no match found, use AI for verification
+    # AI prompt for toxicity detection (in Ukrainian for better accuracy with Ukrainian text)
     prompt = (
         "Визнач, чи є наступний текст образливим, токсичним або неприйнятним. "
         "Відповідай тільки 'YES' або 'NO'.\n\n"
@@ -40,6 +41,7 @@ def is_text_toxic(text: str) -> bool:
         return False
 
 def generate_reply(post_text: str, comment_text: str) -> str:
+    # AI prompt for generating Ukrainian replies (kept in Ukrainian to maintain functionality)
     prompt = (
         "Сформуй коротку, релевантну відповідь українською мовою на цей коментар, враховуючи зміст поста. "
         "Відповідь має бути простою, щирою, неформальною. "
@@ -63,4 +65,4 @@ def generate_reply(post_text: str, comment_text: str) -> str:
         return reply
     except Exception as e:
         print("[AI REPLY ERROR]", e)
-        return "Дякую за ваш коментар!"
+        return "Дякую за ваш коментар!"  # Default Ukrainian response

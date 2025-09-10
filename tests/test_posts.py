@@ -9,7 +9,7 @@ class TestPosts:
 
     @pytest.mark.asyncio
     async def test_create_post(self, client: AsyncClient, auth_headers: dict):
-        # Твой API создает пост по /posts/ и возвращает 200 OK + поля content/is_blocked/...
+        # API creates post via /posts/ and returns 200 OK + content/is_blocked fields
         payload = {"content": "This is a test post."}
 
         resp = await client.post("/posts/", json=payload, headers=auth_headers)
