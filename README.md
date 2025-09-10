@@ -72,7 +72,7 @@ GOOGLE_API_KEY=your-google-ai-api-key
 
 ```bash
 # Start all services
-docker-compose up -d
+docker-compose up -d --build
 
 # View logs
 docker-compose logs -f web
@@ -162,6 +162,8 @@ POST /auth/login
 Content-Type: application/x-www-form-urlencoded
 
 username=user@example.com&password=securepassword
+
+better login through /docs/ using button Authorize
 ```
 
 **Response:**
@@ -314,6 +316,15 @@ pytest tests/test_analytics.py
 pytest -v
 ```
 
+better through docker-compose
+
+```bash
+
+docker-compose exec web pytest -v tests/
+
+```
+
+
 ### Test Coverage
 
 The project includes comprehensive test coverage for:
@@ -328,7 +339,7 @@ The project includes comprehensive test coverage for:
 
 ```bash
 # Start services in development mode
-docker-compose up -d
+docker-compose up -d --build
 
 # View logs
 docker-compose logs -f web
@@ -336,8 +347,11 @@ docker-compose logs -f web
 # Stop services
 docker-compose down
 
+# Use -v if you want clear database
+docker-compose down -v
+
 # Rebuild after changes
-docker-compose up --build
+docker-compose up -d --build
 ```
 
 ### Production Deployment
