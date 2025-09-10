@@ -9,8 +9,8 @@ router = APIRouter()
 
 @router.get("/comments-daily-breakdown")
 async def comments_daily_breakdown(
-    date_from: date = Query(..., description="Початкова дата (YYYY-MM-DD)"),
-    date_to: date = Query(..., description="Кінцева дата (YYYY-MM-DD)"),
+    date_from: date = Query(..., description="Start date (YYYY-MM-DD)"),
+    date_to: date = Query(..., description="End date (YYYY-MM-DD)"),
     db: AsyncSession = Depends(get_db)
 ) -> list[dict]:
     stmt = text("""
