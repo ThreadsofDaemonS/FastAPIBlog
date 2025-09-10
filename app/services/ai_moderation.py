@@ -9,7 +9,7 @@ client = genai.Client(api_key=GOOGLE_API_KEY)
 
 def is_text_toxic(text: str) -> bool:
     # List of banned words for manual checking
-    blacklist = ["dick", "cant", "fuck", "cock", "Bitch", "Whore"]
+    blacklist = ["dick", "cunt", "fuck", "cock", "Bitch", "Whore"]
 
     # Check for presence of words from the list
     if any(bad_word in text.lower() for bad_word in blacklist):
