@@ -35,7 +35,7 @@ def create_access_token(data: dict) -> str:
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
-# Отримання користувача з токена
+# Get user from token
 async def get_current_user(
     token: str = Depends(oauth2_scheme),
     db: AsyncSession = Depends(get_db),

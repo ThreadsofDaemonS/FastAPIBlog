@@ -23,7 +23,7 @@ class TestAnalytics:
 
     @pytest.mark.asyncio
     async def test_post_analytics(self, client: AsyncClient, auth_headers: dict):
-        # Тест допускает 200 (если пост есть) или 404 (если нет)
+        # Test allows 200 (if post exists) or 404 (if not found)
         resp = await client.get("/api/analytics/post/1", headers=auth_headers)
         assert resp.status_code in (200, 404)
 

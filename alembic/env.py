@@ -11,7 +11,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from app.models.comment import Comment
 from app.models.post import Post
 from app.models.user import User
-from app.core.db import Base  # ← это важно
+from app.core.db import Base  # ← this is important
 
 # Build DATABASE_URL from .env
 DATABASE_URL = (
