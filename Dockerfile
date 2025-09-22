@@ -1,26 +1,26 @@
-# Используем базовый образ Python
+# Using basic image of Python
 FROM python:3.11-slim
 
-# Устанавливаем рабочую директорию
+# Set work directory
 WORKDIR /app
 
-# Устанавливаем системные зависимости для работы с PostgreSQL
+# Installing system dependencies for working with PostgreSQL
 RUN apt-get update && apt-get install -y \
     build-essential \
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Копируем зависимости
+# Copy dependencies
 COPY requirements.txt .
 
-# Устанавливаем Python зависимости
+# Installing Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Копируем проект
+# Copy project
 COPY . .
 
-# Открываем порт для приложения
+# Opening a port for the application
 EXPOSE 8000
 
-# Устанавливаем команду по умолчанию
+# Setting the default command
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
